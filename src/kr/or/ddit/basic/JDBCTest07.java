@@ -48,7 +48,7 @@ public class JDBCTest07 {
 
     Scanner scan = new Scanner(System.in); //  키보드 입력 읽기
     private void start() {
-
+// 네번째 깃 테스트
         while (true) {
             // 메뉴 출력
             System.out.println("---------------------------------------------------");
