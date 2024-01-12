@@ -18,7 +18,7 @@ public class jdbcTest03 {
         String sql;
         int minData;
         int maxData;
-
+        // git hub test
         try {
             // 데이터 입력 받기
             System.out.println("1. LPRID_ID > ");
@@ -40,7 +40,7 @@ public class jdbcTest03 {
                   "      , LPROD_NM AS NM " +
                   " FROM LPROD " +
                   " WHERE 1=1 " +
-                  " AND LPROD_ID BETWEEN " + minData + " AND " + + maxData;
+                  " AND LPROD_ID BETWEEN " + minData + " AND " + maxData;
 
             // 드라이버 로드
             Class.forName("oracle.jdbc.driver.OracleDriver");
