@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/jdcbTest.iml" filepath="$PROJECT_DIR$/jdcbTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Daedeok_HighJava.iml" filepath="$PROJECT_DIR$/.idea/Daedeok_HighJava.iml" />
     </modules>
   </component>
 </project>
