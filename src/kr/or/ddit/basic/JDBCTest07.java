@@ -3,7 +3,6 @@ package kr.or.ddit.basic;
 
 import kr.or.ddit.basic.util.JDBCUtil;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.Scanner;
 
@@ -57,7 +56,8 @@ public class JDBCTest07 {
             System.out.println("2. 자료 삭제");
             System.out.println("3. 자료 수정");
             System.out.println("4. 전체 자료 출력");
-            System.out.println("5. 작업 종료");
+            System.out.println("5. 개별 자료 수정");
+            System.out.println("0. 작업 종료");
             System.out.println("---------------------------------------------------");
 
             // 메뉴 입력 받기
@@ -72,12 +72,15 @@ public class JDBCTest07 {
                     deleteMember();
                     break;
                 case 3 :
-                    updateMember();
+                    updateInfoAll();
                     break;
                 case 4 :
                     selectAllMymember();
                     break;
                 case 5 :
+                    updateInfo();
+                    break;
+                case 0 :
                     return;
                 default :
                     System.out.println("올바른 입력이 아닙니다.");
@@ -87,6 +90,122 @@ public class JDBCTest07 {
         }
 
     }
+
+
+    /**
+     * 5. 자료 수정 2
+     */
+    private void updateInfo() {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ResultSetMetaData rsmd = null;
+
+
+        System.out.println("5. 개별 자료 수정 입니다.");
+
+        String inputId = ""; // 사용자로부터 입력받은 아이디
+        System.out.println("수정 할 아이디를 입력하세요 > ");
+        inputId = scan.nextLine();
+
+        while(true) {
+            try{
+                String sql = " SELECT COUNT(MEM_ID) AS IDCHK " +
+                        " FROM MYMEMBER                 " +
+                        " WHERE 1=1                     " +
+                        " AND MEM_ID = TRIM(?)          ";
+                // DB연결
+                conn = JDBCUtil.getConnection();
+
+                // 변수 세팅
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, inputId);
+
+                // rs 검사
+                rs = ps.executeQuery();
+
+                if(rs.next()) {
+                    int result = rs.getInt("IDCHK");
+
+                    if(result > 0){
+                        System.out.println("계정 확인이 완료됐습니다.");
+                        break;
+                    } else {
+                        System.out.println("입력하신 아이디와 암호를 다시 확인 해주세요.");
+                        continue;
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if(null != rs) try { rs.close(); } catch (SQLException e ) { e.printStackTrace(); }
+                if(null != ps) try { ps.close(); } catch (SQLException e ) { e.printStackTrace(); }
+                if(null != conn) try { conn.close(); } catch (SQLException e ) { e.printStackTrace(); }
+            }
+        }
+
+
+        int fieldNum;
+        String updateField = null;
+        String updateTitle = null;
+
+        do{
+            System.out.println();
+            System.out.println("회원님의 정보 중 수정할 항목을 선택하세요");
+            System.out.println("1.비밀번호수정  2.이름수정  3.전화번호수정  4.주소수정");
+            System.out.println("5.나가기");
+
+            // 어떤 메뉴 수정할지 선택
+            fieldNum = scan.nextInt();
+            scan.nextLine(); // 버퍼 비우기
+
+            switch (fieldNum) {
+                case 1 :
+                    updateField = "MEM_PASS";
+                    updateTitle = "비밀번호";
+                    break;
+                case 2 :
+                    updateField = "MEM_NAME";
+                    updateTitle = "회원명";
+                    break;
+                case 3 :
+                    updateField = "MEM_TEL";
+                    updateTitle = "전화번호";
+                    break;
+                case 4 :
+                    updateField = "MEM_ADDR";
+                    updateTitle = "주소";
+                    break;
+                default :
+                    System.out.println("수정 항목을 잘못 선택하셨습니다. 다시 선택하세요.");
+                    break;
+            }
+        }while (fieldNum < 1 || fieldNum > 4);
+
+        System.out.println();
+        System.out.print("새로운 " + updateTitle + " > ");
+        String updateData = scan.nextLine();
+
+        try{
+            conn = JDBCUtil.getConnection();
+            String sql = " UPDATE MYMEMBER SET "+updateField+" = ? " +
+                         " WHERE MEM_ID = ? ";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, updateData);
+            ps.setString(2, inputId);
+
+            int cnt = ps.executeUpdate();
+
+            if(cnt > 0) System.out.println("수정 작업 성공");
+            else System.out.println("수정 작업 실패");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if(rs != null) try { rs.close(); } catch(SQLException e) { e.printStackTrace(); }
+            if(ps != null) try { ps.close(); } catch(SQLException e) { e.printStackTrace(); }
+            if(conn != null) try { conn.close(); } catch(SQLException e) { e.printStackTrace(); }
+        }
+    } // updateInfo() 끝
 
     /**
      * 4. 전체 자료 출력
@@ -100,12 +219,13 @@ public class JDBCTest07 {
         System.out.println("4. 전체 자료 출력 입니다.");
 
         try {
-            String sql = " SELECT " +
-                         "    MEM_ID AS ID, " +
+            String sql = " SELECT               " +
+                         "    MEM_ID AS ID,     " +
                          "    MEM_NAME AS NAME, " +
-                         "    MEM_TEL AS TEL, " +
-                         "    MEM_ADDR AS ADDR " +
-                         " FROM MYMEMBER ";
+                         "    MEM_TEL AS TEL,   " +
+                         "    MEM_ADDR AS ADDR  " +
+                         " FROM MYMEMBER        " +
+                         " ORDER BY MEM_ID ASC  ";
             // DB 연결
             conn = JDBCUtil.getConnection();
             // ps 세팅
@@ -147,7 +267,7 @@ public class JDBCTest07 {
     /**
      * 3. 자료 수정
      */
-    private void updateMember() {
+    private void updateInfoAll() {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -159,7 +279,6 @@ public class JDBCTest07 {
 
         // 사용자로부터 아이디와 패스워드를 입력받아 DB조회 후 일치 여부 검사
         while(true){
-
             try {
                 System.out.println("수정 할 아이디를 입력하세요 > ");
                 inputId = scan.nextLine();
@@ -167,10 +286,10 @@ public class JDBCTest07 {
                 inputPass = scan.nextLine();
 
                 String sql = " SELECT COUNT(MEM_ID) AS IDCHK " +
-                             " FROM MYMEMBER " +
-                             " WHERE 1=1 " +
-                             " AND MEM_ID = TRIM(?) " +
-                             " AND MEM_PASS = TRIM(?) ";
+                             " FROM MYMEMBER                 " +
+                             " WHERE 1=1                     " +
+                             " AND MEM_ID = TRIM(?)          " +
+                             " AND MEM_PASS = TRIM(?)        ";
 
                 // DB연결
                 conn = JDBCUtil.getConnection();
@@ -201,8 +320,6 @@ public class JDBCTest07 {
                 if(null != ps) try { ps.close(); } catch (SQLException e ) { e.printStackTrace(); }
                 if(null != conn) try { conn.close(); } catch (SQLException e ) { e.printStackTrace(); }
             }
-
-
         }
 
 
@@ -218,13 +335,13 @@ public class JDBCTest07 {
             String changeAddr = scan.nextLine();
 
             String sql = " UPDATE MYMEMBER SET " +
-                         "     MEM_PASS = ?, " +
-                         "     MEM_NAME = ?, " +
-                         "     MEM_TEL = ?, " +
-                         "     MEM_ADDR = ? " +
-                         " WHERE 1=1 " +
-                         " AND MEM_ID = ? " +
-                         " AND MEM_PASS = ? ";
+                         "     MEM_PASS = TRIM(?) ,   " +
+                         "     MEM_NAME = TRIM(?) ,   " +
+                         "     MEM_TEL = TRIM(?) ,    " +
+                         "     MEM_ADDR = TRIM(?)     " +
+                         " WHERE 1=1                  " +
+                         " AND MEM_ID = ?             " +
+                         " AND MEM_PASS = ?           ";
 
             // DB연결
             conn = JDBCUtil.getConnection();
@@ -245,7 +362,6 @@ public class JDBCTest07 {
             } else {
                 System.out.println("이게 뭔 상황?");
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -278,10 +394,10 @@ public class JDBCTest07 {
 
                 // 입력된 계정의 정보 일치여부 조회한다
                 String sql = " SELECT COUNT(MEM_ID) AS IDCHK " +
-                        " FROM MYMEMBER " +
-                        " WHERE 1=1 " +
-                        " AND MEM_ID = TRIM(?) " +
-                        " AND MEM_PASS = TRIM(?) ";
+                        " FROM MYMEMBER                      " +
+                        " WHERE 1=1                          " +
+                        " AND MEM_ID = TRIM(?)               " +
+                        " AND MEM_PASS = TRIM(?)             ";
 
                 conn = JDBCUtil.getConnection();
                 ps = conn.prepareStatement(sql);
@@ -321,9 +437,9 @@ public class JDBCTest07 {
             // String inputPass; // 사용자로부터 입력받은 암호
 
             String SQL = " DELETE FROM MYMEMBER " +
-                         " WHERE 1=1 " +
-                         " AND MEM_ID = ? " +
-                         " AND MEM_PASS = ? ";
+                         " WHERE 1=1            " +
+                         " AND MEM_ID = ?       " +
+                         " AND MEM_PASS = ?     ";
 
             conn = JDBCUtil.getConnection();
             ps = conn.prepareStatement(SQL);
@@ -382,47 +498,42 @@ public class JDBCTest07 {
 //        }
 
         String inputId = "";
-        try {
-            // 중복이 아닌 아이디를 입력할 때 까지 반족
-            while (true){
-                try {
-                    // 회원 아이디 중복값 존재 확인
-                    System.out.println("아이디를 입력 하세요 > ");
-                    inputId = scan.nextLine();
+        // 중복이 아닌 아이디를 입력할 때 까지 반족
+        while (true){
+            try {
+                // 회원 아이디 중복값 존재 확인
+                System.out.println("아이디를 입력 하세요 > ");
+                inputId = scan.nextLine();
 
-                    conn = JDBCUtil.getConnection();
-                    String sql = " SELECT COUNT(MEM_ID) AS IDCHK " +
-                                 " FROM MYMEMBER " +
-                                 " WHERE 1=1 " +
-                                 " AND MEM_ID = TRIM( ? ) ";
-                    ps = conn.prepareStatement(sql);
-                    ps.setString(1, inputId);
-                    rs = ps.executeQuery();
+                conn = JDBCUtil.getConnection();
+                String sql = " SELECT COUNT(MEM_ID) AS IDCHK " +
+                        " FROM MYMEMBER " +
+                        " WHERE 1=1 " +
+                        " AND MEM_ID = TRIM( ? ) ";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, inputId);
+                rs = ps.executeQuery();
 
-                    if(rs.next()) {
-                        int count = rs.getInt("IDCHK");
-                        if(count > 0){ // 가능
-                            System.out.println("이미 존재하는 아이디 입니다.");
-                            System.out.println("다시 입력해주세요.");
-                            if(null != rs) try { rs.close(); } catch (SQLException e ) { e.printStackTrace(); }
-                            if(null != ps) try { ps.close(); } catch (SQLException e ) { e.printStackTrace(); }
-                        } else {
-                            System.out.println("사용 가능한 ID입니다.");
-                            break;
-                        }
+                if(rs.next()) {
+                    int count = rs.getInt("IDCHK");
+                    if(count > 0){ // 가능
+                        System.out.println("이미 존재하는 아이디 입니다.");
+                        System.out.println("다시 입력해주세요.");
                     } else {
-                        System.out.println("오류가 발생 했습니다.");
+                        System.out.println("사용 가능한 ID입니다.");
+                        break;
                     }
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                } else {
+                    System.out.println("오류가 발생 했습니다.");
+                    return;
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if(null != rs) try { rs.close(); } catch (SQLException e ) { e.printStackTrace(); }
+                if(null != ps) try { ps.close(); } catch (SQLException e ) { e.printStackTrace(); }
+                if(null != conn) try { conn.close(); } catch (SQLException e ) { e.printStackTrace(); }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if(null != rs) try { rs.close(); } catch (SQLException e ) { e.printStackTrace(); }
-            if(null != ps) try { ps.close(); } catch (SQLException e ) { e.printStackTrace(); }
-            if(null != conn) try { conn.close(); } catch (SQLException e ) { e.printStackTrace(); }
         }
 
         // 회원 정보 DB 삽입
@@ -438,18 +549,8 @@ public class JDBCTest07 {
 
         try {
             conn = JDBCUtil.getConnection();
-            String SQL = " INSERT INTO MYMEMBER ( " +
-                         "    MEM_ID " +
-                         "    , MEM_PASS " +
-                         "    , MEM_NAME " +
-                         "    , MEM_TEL " +
-                         "    , MEM_ADDR) " +
-                         " VALUES( " +
-                         "      ? " +
-                         "    , ? " +
-                         "    , ? " +
-                         "    , ? " +
-                         "    , ? ) ";
+            String SQL = " INSERT INTO MYMEMBER (  MEM_ID, MEM_PASS, MEM_NAME, MEM_TEL, MEM_ADDR) " +
+                         " VALUES( ?, ?, ?, ?, ? ) ";
 
             ps = conn.prepareStatement(SQL);
             ps.setString(1, inputId);
@@ -466,6 +567,10 @@ public class JDBCTest07 {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            //if(null != rs) try { rs.close(); } catch (SQLException e ) { e.printStackTrace(); }
+            if(null != ps) try { ps.close(); } catch (SQLException e ) { e.printStackTrace(); }
+            if(null != conn) try { conn.close(); } catch (SQLException e ) { e.printStackTrace(); }
         }
     }
 }
