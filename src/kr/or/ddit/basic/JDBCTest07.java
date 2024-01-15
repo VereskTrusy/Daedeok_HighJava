@@ -2,6 +2,7 @@ package kr.or.ddit.basic;
 
 
 import kr.or.ddit.basic.util.JDBCUtil;
+import kr.or.ddit.basic.util.JDBCUtil3;
 
 import java.sql.*;
 import java.util.Scanner;
@@ -99,12 +100,11 @@ public class JDBCTest07 {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        ResultSetMetaData rsmd = null;
 
 
         System.out.println("5. 개별 자료 수정 입니다.");
 
-        String inputId = ""; // 사용자로부터 입력받은 아이디
+        String inputId; // 사용자로부터 입력받은 아이디
         System.out.println("수정 할 아이디를 입력하세요 > ");
         inputId = scan.nextLine();
 
@@ -132,7 +132,7 @@ public class JDBCTest07 {
                         break;
                     } else {
                         System.out.println("입력하신 아이디와 암호를 다시 확인 해주세요.");
-                        continue;
+                        //continue;
                     }
                 }
             } catch (SQLException e) {
@@ -201,7 +201,7 @@ public class JDBCTest07 {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if(rs != null) try { rs.close(); } catch(SQLException e) { e.printStackTrace(); }
+            //if(rs != null) try { rs.close(); } catch(SQLException e) { e.printStackTrace(); }
             if(ps != null) try { ps.close(); } catch(SQLException e) { e.printStackTrace(); }
             if(conn != null) try { conn.close(); } catch(SQLException e) { e.printStackTrace(); }
         }
@@ -227,7 +227,9 @@ public class JDBCTest07 {
                          " FROM MYMEMBER        " +
                          " ORDER BY MEM_ID ASC  ";
             // DB 연결
-            conn = JDBCUtil.getConnection();
+//            conn = JDBCUtil.getConnection();
+//            conn = JDBCUtil2.getConnection(); // properties 파일 읽어서 사용해봄 하지만 이건 옛날 방식임
+            conn = JDBCUtil3.getConnection(); // ResourceBundle 객체를 이용한 Properties 읽기
             // ps 세팅
             ps = conn.prepareStatement(sql);
             // 결과

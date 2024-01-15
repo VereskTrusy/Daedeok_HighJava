@@ -25,3 +25,13 @@
 
 24.01.14  
         숙제 다했다 아 머리가 이제 못쓸지경인가? 생각이 하나도 안나네 ㄷㄷ..
+
+24.01.15  
+        properties 파일을 활용한 JDBC 세팅
+        
+        1. Collection의 Properties 객체를 활용하여
+           res패키지를 만들고 하위 config패키지에서 .properties
+           파일을 읽어 JDBC의 driver,url,user,pass를 세팅해주기
+        2. ResourceBundle 객체를 활용하여 Properties 기능을
+           작성하기(요즘엔 이렇게 쓴다)
+
