@@ -12,15 +12,12 @@ import java.util.ResourceBundle;
  */
 public class JDBCUtil3 {
     private static ResourceBundle bundle;
-    
-    // 정적 초기화 블록
+
+    // 정적초기화 블록
     static{
         bundle = ResourceBundle.getBundle("res.kr.or.ddit.config.dbinfo");
-
         try {
-
             Class.forName(bundle.getString("driver"));
-
 //            Class.forName("oracle.jdbc.driver.OracleDriver");
         } catch (ClassNotFoundException e) {
             System.out.println("OracleDriver 로딩 실패");

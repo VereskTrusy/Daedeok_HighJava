@@ -115,7 +115,7 @@ public class JDBCTest07 {
                         " WHERE 1=1                     " +
                         " AND MEM_ID = TRIM(?)          ";
                 // DB연결
-                conn = JDBCUtil.getConnection();
+                conn = JDBCUtil3.getConnection();
 
                 // 변수 세팅
                 ps = conn.prepareStatement(sql);
@@ -187,7 +187,7 @@ public class JDBCTest07 {
         String updateData = scan.nextLine();
 
         try{
-            conn = JDBCUtil.getConnection();
+            conn = JDBCUtil3.getConnection();
             String sql = " UPDATE MYMEMBER SET "+updateField+" = ? " +
                          " WHERE MEM_ID = ? ";
             ps = conn.prepareStatement(sql);
@@ -294,7 +294,7 @@ public class JDBCTest07 {
                              " AND MEM_PASS = TRIM(?)        ";
 
                 // DB연결
-                conn = JDBCUtil.getConnection();
+                conn = JDBCUtil3.getConnection();
 
                 // 변수 세팅
                 ps = conn.prepareStatement(sql);
@@ -346,7 +346,7 @@ public class JDBCTest07 {
                          " AND MEM_PASS = ?           ";
 
             // DB연결
-            conn = JDBCUtil.getConnection();
+            conn = JDBCUtil3.getConnection();
             // 변수 세팅
             ps = conn.prepareStatement(sql);
             ps.setString(1, changePass);
@@ -401,7 +401,7 @@ public class JDBCTest07 {
                         " AND MEM_ID = TRIM(?)               " +
                         " AND MEM_PASS = TRIM(?)             ";
 
-                conn = JDBCUtil.getConnection();
+                conn = JDBCUtil3.getConnection();
                 ps = conn.prepareStatement(sql);
                 ps.setString(1, inputId);
                 ps.setString(2, inputPass);
@@ -443,7 +443,7 @@ public class JDBCTest07 {
                          " AND MEM_ID = ?       " +
                          " AND MEM_PASS = ?     ";
 
-            conn = JDBCUtil.getConnection();
+            conn = JDBCUtil3.getConnection();
             ps = conn.prepareStatement(SQL);
             ps.setString(1, inputId);
             ps.setString(2, inputPass);
@@ -507,7 +507,7 @@ public class JDBCTest07 {
                 System.out.println("아이디를 입력 하세요 > ");
                 inputId = scan.nextLine();
 
-                conn = JDBCUtil.getConnection();
+                conn = JDBCUtil3.getConnection();
                 String sql = " SELECT COUNT(MEM_ID) AS IDCHK " +
                         " FROM MYMEMBER " +
                         " WHERE 1=1 " +
@@ -550,7 +550,7 @@ public class JDBCTest07 {
         String inputAddr = scan.nextLine();
 
         try {
-            conn = JDBCUtil.getConnection();
+            conn = JDBCUtil3.getConnection();
             String SQL = " INSERT INTO MYMEMBER (  MEM_ID, MEM_PASS, MEM_NAME, MEM_TEL, MEM_ADDR) " +
                          " VALUES( ?, ?, ?, ?, ? ) ";
 
